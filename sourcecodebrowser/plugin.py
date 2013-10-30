@@ -2,6 +2,7 @@ import os
 import sys
 import logging
 import tempfile
+import pdb
 from . import ctags
 from gi.repository import GObject, GdkPixbuf, Gedit, Gtk, PeasGtk, Gio
 
@@ -209,8 +210,8 @@ class SourceTree(Gtk.VBox):
         iter = model.get_iter(path)
         uri = model.get_value(iter, 3)
         line = model.get_value(iter, 4)
-        if uri and line:
-            self.emit("tag-activated", (uri, line))
+        if model and iter:
+            self.emit("tag-activated", (model, iter))
 
     def parse_file(self, path, uri):
         """
@@ -465,14 +466,9 @@ class SourceCodeBrowserPlugin(GObject.Object, Gedit.WindowActivatable, PeasGtk.C
         
     def on_tag_activated(self, sourcetree, location, data=None):
         """ Go to the line where the double-clicked symbol is defined. """
-        uri, line = location
-        self._log.debug("%s, line %s." % (uri, line))
-        document = self.window.get_active_document()
-        view = self.window.get_active_view()
-        line = int(line) - 1 # lines start from 0
-        document.goto_line(line)
-        view.scroll_to_cursor()
-        
+        #pdb.set_trace()
+        os.system('gnome-terminal -x vi -t ' + location[0].get_value(location[1], 1) + ' &')     
+ 
     def _version_check(self):
         """ Make sure the exhuberant ctags is installed. """
         self.ctags_version = ctags.get_ctags_version(self.ctags_executable) 
